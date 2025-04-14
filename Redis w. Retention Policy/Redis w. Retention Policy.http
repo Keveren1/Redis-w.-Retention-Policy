@@ -1,0 +1,6 @@
+@Redis_w._Retention_Policy_HostAddress = http://localhost:5035
+
+GET {{Redis_w._Retention_Policy_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
