@@ -1,10 +1,9 @@
 # Configurations & their explanations
 ## Configuration 1: Redis With Retention Policy
 
-`SETEX` bruges til **SET with EXpiry**, hvilket betyder, at vi manuelt sætter en timer på, hvor længe et objekt skal være gemt i databasen.
+`SETEX` is used to **SET with EXpiry**, which means, that we manually put a timer on how long our object is stored in the database.
 
-For vores API har vi konfigureret alle nye objekter til at udløbe efter **1 dag**, ved at bruge følgende kommando:
-
+For our API, we have configured all newly created objects to expire after **1 day**, by using the following command:
 ```csharp
 _redisDb.StringSet(key, value, TimeSpan.FromDays(1));
 ```
