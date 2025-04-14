@@ -1,10 +1,43 @@
 # Redis w. Retention Policy
 
+1. **Install Redis on two different machines and configure them to run on different ports**
+   - Installed Redis using Docker with:
+     - Master on port **6379**
+     - Slave on port **6380**
 
+2. **Use the Redis CLI or Redis Telnet CLI to set up a Master-Slave replication configuration between the two Redis instances**
+   - Used `redis-cli` to connect the slave to the master using the `SLAVEOF` command
+   - Verified data replication from master to slave
 
+3. **Use the Redis CLI or Redis Telnet CLI to store user data in the Master Redis instance**
+   - Used the `SET` command to store data:
+     ```bash
+     SET user:1234 "Alice"
+     SET user:4321 "Martin"
+     ```
+4. **Verify that the Slave Redis instance is replicating data from the Master instance**
+   - In the slave Redis CLI, checked for the existence of the keys:
+     ```bash
+     GET user:1234
+     GET user:4321
+     ```
+5. **Test the configuration by stopping the Master Redis instance and verifying that the Slave Redis instance can handle requests**
+   - Stopped the master:
+     ```bash
+     docker stop redis-master
+     ```
+   - Tried to read keys that were written earlier:
+     ```bash
+     GET user:1234  # Returns "Alice"
+     GET user:4321  # Returns "Martin"
+     ```
+   - Verified that data was still accessible from the slave, confirming replication worked
 
-
-
+   - Attempted to write to the slave:
+     ```bash
+     SET user:5678 "Bob"
+     ```
+   - Received an error since the slave is **read-only by default** — writes are not allowed unless it is promoted to master
 
 
 
