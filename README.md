@@ -49,20 +49,89 @@ _redisDb.StringSet(key, value, TimeSpan.FromDays(1));
 
 
 
+# 🧱 Redis Cluster Setup – Opgave 3
 
+A step-by-step guide to creating a Redis cluster using Docker on ports **7000–7005**.
 
+---
 
+## 🔹 Step 1: Create Directories for Redis Nodes
 
+```powershell
+7000..7005 | % { New-Item -ItemType Directory -Path ".\$_" -Force }
+```
 
+This creates 6 directories (`7000` to `7005`), one for each Redis node to store its configuration and data.
 
+---
 
+## 🔹 Step 2: Create Docker Network
 
+```bash
+docker network create redis-cluster-net
+```
 
+This sets up a dedicated Docker network so the containers can communicate with each other.
 
+---
 
+## 🔹 Step 3: Configure Each Redis Node
 
+```powershell
+7000..7005 | % {
+@"
+port 6379
+cluster-enabled yes
+cluster-config-file nodes.conf
+cluster-node-timeout 5000
+appendonly yes
+"@ | Out-File -FilePath ".\$_\redis.conf" -Encoding ascii
+}
+```
 
+This writes a `redis.conf` file with basic cluster settings into each of the 6 directories.
 
+---
+
+## 🔹 Step 4: Start Redis Containers
+
+```powershell
+7000..7005 | % {
+  $port = $_
+  $volume = "$PWD\$port" + ":/data"
+  docker run -d --name "redis-$port" --network redis-cluster-net -v $volume redis redis-server /data/redis.conf
+}
+```
+This runs 6 Redis containers, each with its own volume and configuration file.
+
+---
+
+## 🔹 Step 5: Create the Cluster
+
+```bash
+docker exec -it redis-7000 redis-cli --cluster create \
+redis-7000:6379 redis-7001:6379 redis-7002:6379 \
+redis-7003:6379 redis-7004:6379 redis-7005:6379 \
+--cluster-replicas 1
+```
+---
+
+## 🔹 Step 6: Connect to the Cluster
+
+```bash
+docker exec -it redis-7000 redis-cli -c
+```
+---
+
+## 🔹 Step 7: Test the Cluster
+
+Inside the Redis CLI:
+
+```redis
+SET user:1:name "PlayerOne"
+CLUSTER KEYSLOT user:1:name
+CLUSTER NODES
+```
 
 
 
