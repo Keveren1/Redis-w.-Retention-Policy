@@ -1,5 +1,14 @@
-# Redis w. Retention Policy
+# Configurations & their explanations
+## Configuration 1: Redis With Retention Policy
 
+`SETEX` bruges til **SET with EXpiry**, hvilket betyder, at vi manuelt sætter en timer på, hvor længe et objekt skal være gemt i databasen.
+
+For vores API har vi konfigureret alle nye objekter til at udløbe efter **1 dag**, ved at bruge følgende kommando:
+
+```csharp
+_redisDb.StringSet(key, value, TimeSpan.FromDays(1));
+```
+## Configuration 2: Redis Master-Slave Replication
 1. **Install Redis on two different machines and configure them to run on different ports**
    - Installed Redis using Docker with:
      - Master on port **6379**
